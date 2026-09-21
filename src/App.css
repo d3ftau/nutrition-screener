@@ -1,0 +1,234 @@
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.app-header {
+  padding: 20px 24px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header h1 {
+  font-size: 22px;
+}
+
+.subtitle {
+  color: var(--text);
+  opacity: 0.7;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.filter-panel {
+  width: 260px;
+  flex-shrink: 0;
+  padding: 16px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  background: var(--bg-alt);
+}
+
+.filter-section {
+  margin-bottom: 20px;
+}
+
+.filter-section h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+.search-box {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.sort-row {
+  display: flex;
+  gap: 6px;
+}
+
+.sort-row select {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.dir-toggle {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.threshold-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.threshold-field span {
+  flex: 1;
+}
+
+.threshold-field input {
+  width: 80px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.results-pane {
+  flex: 1;
+  padding: 16px 24px;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.error-banner {
+  color: var(--danger);
+  margin-bottom: 12px;
+}
+
+.loading-banner {
+  opacity: 0.6;
+  margin-bottom: 12px;
+}
+
+.empty-state {
+  opacity: 0.6;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-alt);
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.name-cell {
+  white-space: normal;
+  min-width: 220px;
+  max-width: 320px;
+}
+
+.name-cell a {
+  color: var(--text-h);
+  text-decoration: none;
+}
+
+.name-cell a:hover {
+  text-decoration: underline;
+}
+
+tr.flagged-row {
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
+.tier-tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin: 1px 2px 1px 0;
+  color: #fff;
+}
+
+.tier-avoid { background: var(--danger); }
+.tier-caution { background: var(--caution); color: #201800; }
+.tier-contested { background: var(--contested); }
+
+.allergen-tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin: 1px 2px 1px 0;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

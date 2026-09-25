@@ -8,6 +8,11 @@ export interface ScreenerProduct {
   on_special: boolean | null;
   package_size: string | null;
   package_weight_grams: number | null;
+  // Declared net contents -- the denominator for every price ratio.
+  // package_weight_grams above is GROSS shipped mass on Woolworths rows
+  // and is NOT interchangeable with it.
+  net_content_grams: number | null;
+  net_content_basis: string | null;
   category: string | null;
   category_top: string | null;
 
@@ -33,7 +38,8 @@ export interface ScreenerProduct {
   additive_slugs: string[] | null;
   additive_tiers: string[] | null;
   additive_count: number | null;
-  dietary_tags: string[] | null;
+  diet_tags: string[] | null;
+  claim_tags: string[] | null;
   allergen_tokens: string[] | null;
   allergen_may_tokens: string[] | null;
 }

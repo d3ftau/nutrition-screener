@@ -7,7 +7,8 @@ export interface QueryState {
   thresholds: ThresholdFilters;
   excludedTiers: AdditiveTier[];
   excludedAllergens: string[];
-  requiredDietaryTags: string[];
+  requiredDietTags: string[];
+  requiredClaimTags: string[];
   sort: SortState;
   page: number; // 0-indexed
   /** When true, excluded tiers/allergens are NOT filtered out of the
@@ -54,8 +55,11 @@ export async function runScreenerQuery(state: QueryState): Promise<QueryResult> 
       q = q.not("allergen_tokens", "cs", `{${allergen}}`);
     }
   }
-  for (const tag of state.requiredDietaryTags) {
-    q = q.contains("dietary_tags", [tag]);
+  for (const tag of state.requiredDietTags) {
+    q = q.contains("diet_tags", [tag]);
+  }
+  for (const tag of state.requiredClaimTags) {
+    q = q.contains("claim_tags", [tag]);
   }
 
   q = q.order(state.sort.column, { ascending: state.sort.ascending, nullsFirst: false });

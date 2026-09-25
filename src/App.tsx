@@ -12,7 +12,8 @@ function App() {
   const [thresholds, setThresholds] = useState<ThresholdFilters>(EMPTY_THRESHOLDS);
   const [excludedTiers, setExcludedTiers] = useState<AdditiveTier[]>([]);
   const [excludedAllergens, setExcludedAllergens] = useState<string[]>([]);
-  const [requiredDietaryTags, setRequiredDietaryTags] = useState<string[]>([]);
+  const [requiredDietTags, setRequiredDietTags] = useState<string[]>([]);
+  const [requiredClaimTags, setRequiredClaimTags] = useState<string[]>([]);
   const [showExcluded, setShowExcluded] = useState(false);
   const [sort, setSort] = useState<SortState>({ column: "protein_g_per_dollar", ascending: false });
   const [page, setPage] = useState(0);
@@ -26,7 +27,7 @@ function App() {
   // a new result set would show a confusing "no rows" or wrong slice.
   useEffect(() => {
     setPage(0);
-  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietaryTags, showExcluded, sort]);
+  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, showExcluded, sort]);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,7 +35,7 @@ function App() {
       setLoading(true);
       setError(null);
       runScreenerQuery({
-        search, thresholds, excludedTiers, excludedAllergens, requiredDietaryTags,
+        search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags,
         sort, page, showExcluded,
       })
         .then((result) => {
@@ -55,7 +56,7 @@ function App() {
       cancelled = true;
       clearTimeout(handle);
     };
-  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietaryTags, showExcluded, sort, page]);
+  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, showExcluded, sort, page]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
@@ -64,7 +65,10 @@ function App() {
       <header className="app-header">
         <h1>Nutrition Screener</h1>
         <p className="subtitle">
-          {totalCount.toLocaleString()} matching products. Additive/allergen/dietary data is Woolworths-only for now — other stores show price and nutrition only.
+          {totalCount.toLocaleString()} matching products. Additive, allergen and
+          label-claim data covers Woolworths and Coles; ALDI shows price and
+          nutrition only. Dietary suitability tags are Woolworths-only — Coles
+          does not publish them.
         </p>
       </header>
 
@@ -74,7 +78,8 @@ function App() {
           thresholds={thresholds} onThresholdsChange={setThresholds}
           excludedTiers={excludedTiers} onExcludedTiersChange={setExcludedTiers}
           excludedAllergens={excludedAllergens} onExcludedAllergensChange={setExcludedAllergens}
-          requiredDietaryTags={requiredDietaryTags} onRequiredDietaryTagsChange={setRequiredDietaryTags}
+          requiredDietTags={requiredDietTags} onRequiredDietTagsChange={setRequiredDietTags}
+          requiredClaimTags={requiredClaimTags} onRequiredClaimTagsChange={setRequiredClaimTags}
           sort={sort} onSortChange={setSort}
           showExcluded={showExcluded} onShowExcludedChange={setShowExcluded}
         />

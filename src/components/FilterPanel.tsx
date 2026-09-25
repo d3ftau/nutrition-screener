@@ -1,5 +1,5 @@
 import type { AdditiveTier, SortColumn, SortState, ThresholdFilters } from "../lib/types";
-import { ADDITIVE_TIERS, ALLERGEN_TERMS, DIETARY_TAGS, SORT_OPTIONS } from "../lib/constants";
+import { ADDITIVE_TIERS, ALLERGEN_TERMS, CLAIM_TAGS, DIET_TAGS, SORT_OPTIONS } from "../lib/constants";
 
 interface Props {
   search: string;
@@ -10,8 +10,10 @@ interface Props {
   onExcludedTiersChange: (tiers: AdditiveTier[]) => void;
   excludedAllergens: string[];
   onExcludedAllergensChange: (a: string[]) => void;
-  requiredDietaryTags: string[];
-  onRequiredDietaryTagsChange: (tags: string[]) => void;
+  requiredDietTags: string[];
+  requiredClaimTags: string[];
+  onRequiredDietTagsChange: (tags: string[]) => void;
+  onRequiredClaimTagsChange: (tags: string[]) => void;
   sort: SortState;
   onSortChange: (s: SortState) => void;
   showExcluded: boolean;
@@ -116,14 +118,39 @@ export function FilterPanel(props: Props) {
       </div>
 
       <div className="filter-section">
-        <h3>Require dietary tags</h3>
+        <h3>Require dietary suitability</h3>
+        <p className="filter-note">
+          Only Woolworths declares these. Requiring one limits results to
+          Woolworths products — Coles publishes no suitability statement at all,
+          so an absent tag means "not stated", not "not suitable".
+        </p>
         <div className="chip-grid">
-          {DIETARY_TAGS.map((tag) => (
+          {DIET_TAGS.map((tag) => (
             <label key={tag} className="checkbox-row">
               <input
                 type="checkbox"
-                checked={props.requiredDietaryTags.includes(tag)}
-                onChange={() => props.onRequiredDietaryTagsChange(toggle(props.requiredDietaryTags, tag))}
+                checked={props.requiredDietTags.includes(tag)}
+                onChange={() => props.onRequiredDietTagsChange(toggle(props.requiredDietTags, tag))}
+              />
+              <span>{tag}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="filter-section">
+        <h3>Require label claims</h3>
+        <p className="filter-note">
+          Stated by both stores. Wording differences between them are already
+          normalised, so "low sugar" matches both retailers' phrasing.
+        </p>
+        <div className="chip-grid">
+          {CLAIM_TAGS.map((tag) => (
+            <label key={tag} className="checkbox-row">
+              <input
+                type="checkbox"
+                checked={props.requiredClaimTags.includes(tag)}
+                onChange={() => props.onRequiredClaimTagsChange(toggle(props.requiredClaimTags, tag))}
               />
               <span>{tag}</span>
             </label>

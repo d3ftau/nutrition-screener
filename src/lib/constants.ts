@@ -10,12 +10,28 @@ export const ALLERGEN_TERMS = [
 
 export const ADDITIVE_TIERS: AdditiveTier[] = ["avoid", "caution", "contested"];
 
-// Mirrors screenerFacts.ts's KNOWN_DIETARY_TAG_SLUGS.
-export const DIETARY_TAGS = [
-  "gluten-free", "halal", "high-fibre", "high-protein", "kosher",
-  "low-fat", "low-salt", "low-saturated-fat", "low-sugar", "no-caffeine",
-  "organic", "source-of-fibre", "source-of-protein", "vegan",
-  "vegetarian", "wholegrain",
+// Suitability tags -- mirrors screenerFacts.ts's
+// DIET_SUITABILITY_TAG_SLUGS. ONLY Woolworths states these: Coles
+// publishes no suitability statement anywhere in its payload (verified
+// across its whole corpus), so requiring one of these necessarily
+// narrows results to Woolworths. The UI says so rather than letting a
+// store vanish silently.
+export const DIET_TAGS = [
+  "gluten-free", "halal", "kosher", "vegan", "vegetarian",
+] as const;
+
+// Nutrient-content and marketing claims -- the other half of what used
+// to be one mixed `dietary_tags` array. Both stores state these, and the
+// wording differences between them ("Low Sugar" vs "Low in Sugar") are
+// already normalised to these slugs by screenerFacts.ts.
+export const CLAIM_TAGS = [
+  "high-fibre", "high-protein", "low-fat", "low-salt",
+  "low-saturated-fat", "low-sugar", "no-added-sugars", "no-added-salt",
+  "no-added-colours", "no-artificial-flavours-or-colours",
+  "no-caffeine", "no-preservatives", "organic", "source-of-fibre",
+  "source-of-protein", "source-of-calcium", "source-of-iron",
+  "source-of-vitamin-c", "wholegrain", "low-gi", "cholesterol-free",
+  "omega-3", "high-in-antioxidants",
 ] as const;
 
 export const SORT_OPTIONS: { value: SortColumn; label: string }[] = [

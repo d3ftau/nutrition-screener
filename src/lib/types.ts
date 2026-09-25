@@ -46,6 +46,15 @@ export interface ScreenerProduct {
 
 export type AdditiveTier = "avoid" | "caution" | "contested";
 
+/** One row per (store, category_top) -- fetched live, never hardcoded,
+ *  because category_top is scrape-derived data that grows as crawls
+ *  complete, not a code-level enum like the other filter facets. */
+export interface CategoryFacet {
+  store: string;
+  category_top: string;
+  product_count: number;
+}
+
 /** Every threshold filter is a bound on one ratio column: minimums for
  *  "more is better" metrics, maximums for "less is better" ones. */
 export interface ThresholdFilters {

@@ -55,6 +55,17 @@
   margin-bottom: 8px;
 }
 
+.category-store-group {
+  margin-bottom: 10px;
+}
+
+.category-store-group h4 {
+  font-size: 11px;
+  text-transform: capitalize;
+  opacity: 0.5;
+  margin: 0 0 4px;
+}
+
 .search-box {
   width: 100%;
   padding: 8px 10px;

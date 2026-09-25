@@ -1,4 +1,4 @@
-import type { AdditiveTier, SortColumn, SortState, ThresholdFilters } from "../lib/types";
+import type { AdditiveTier, CategoryFacet, SortColumn, SortState, ThresholdFilters } from "../lib/types";
 import { ADDITIVE_TIERS, ALLERGEN_TERMS, CLAIM_TAGS, DIET_TAGS, SORT_OPTIONS } from "../lib/constants";
 
 interface Props {
@@ -14,6 +14,9 @@ interface Props {
   requiredClaimTags: string[];
   onRequiredDietTagsChange: (tags: string[]) => void;
   onRequiredClaimTagsChange: (tags: string[]) => void;
+  categoryFacets: CategoryFacet[];
+  categories: string[];
+  onCategoriesChange: (categories: string[]) => void;
   sort: SortState;
   onSortChange: (s: SortState) => void;
   showExcluded: boolean;
@@ -22,6 +25,21 @@ interface Props {
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+}
+
+/** Groups facets by store for display -- the two stores' category
+ *  vocabularies are completely disjoint (measured: zero shared strings,
+ *  same finding as diet/claim tags), so a flat merged list would jumble
+ *  "Pantry" in next to "GROCERIES" with no indication of which store
+ *  either belongs to. */
+function groupByStore(facets: CategoryFacet[]): Map<string, CategoryFacet[]> {
+  const grouped = new Map<string, CategoryFacet[]>();
+  for (const facet of facets) {
+    const forStore = grouped.get(facet.store) ?? [];
+    forStore.push(facet);
+    grouped.set(facet.store, forStore);
+  }
+  return grouped;
 }
 
 function NumberField({
@@ -136,6 +154,27 @@ export function FilterPanel(props: Props) {
             </label>
           ))}
         </div>
+      </div>
+
+      <div className="filter-section">
+        <h3>Category</h3>
+        {[...groupByStore(props.categoryFacets)].map(([store, facets]) => (
+          <div key={store} className="category-store-group">
+            <h4>{store}</h4>
+            <div className="chip-grid">
+              {facets.map((f) => (
+                <label key={f.category_top} className="checkbox-row">
+                  <input
+                    type="checkbox"
+                    checked={props.categories.includes(f.category_top)}
+                    onChange={() => props.onCategoriesChange(toggle(props.categories, f.category_top))}
+                  />
+                  <span>{f.category_top} ({f.product_count.toLocaleString()})</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="filter-section">

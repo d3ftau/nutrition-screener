@@ -1,5 +1,5 @@
 import { supabase } from "./supabaseClient";
-import type { AdditiveTier, CategoryFacet, ScreenerProduct, SortState, ThresholdFilters } from "./types";
+import type { AdditiveTier, CategoryGroupFacet, ScreenerProduct, SortState, ThresholdFilters } from "./types";
 import { PAGE_SIZE } from "./constants";
 
 export interface QueryState {
@@ -9,7 +9,7 @@ export interface QueryState {
   excludedAllergens: string[];
   requiredDietTags: string[];
   requiredClaimTags: string[];
-  categories: string[];
+  categoryGroups: string[];
   sort: SortState;
   page: number; // 0-indexed
   /** When true, excluded tiers/allergens are NOT filtered out of the
@@ -63,11 +63,11 @@ export async function runScreenerQuery(state: QueryState): Promise<QueryResult> 
     q = q.contains("claim_tags", [tag]);
   }
   // OR semantics, unlike the tag filters above (which AND several
-  // required tags together): picking "Pantry" and "Bakery" means either,
-  // not both -- a product has exactly one category_top, so requiring
-  // more than one would always return nothing.
-  if (state.categories.length > 0) {
-    q = q.in("category_top", state.categories);
+  // required tags together): picking "Meat & Poultry" and "Bakery"
+  // means either, not both -- a product has exactly one category_group,
+  // so requiring more than one would always return nothing.
+  if (state.categoryGroups.length > 0) {
+    q = q.in("category_group", state.categoryGroups);
   }
 
   q = q.order(state.sort.column, { ascending: state.sort.ascending, nullsFirst: false });
@@ -81,18 +81,17 @@ export async function runScreenerQuery(state: QueryState): Promise<QueryResult> 
   return { rows: (data ?? []) as ScreenerProduct[], totalCount: count ?? 0 };
 }
 
-/** category_top is scrape-derived, not a fixed enum, so the filter's
+/** category_group is scrape-derived, not a fixed enum, so the filter's
  *  option list is fetched live rather than hardcoded -- see
- *  product_screener_categories' own migration comment. Fetched once on
- *  mount, not on every query: the facet counts drifting slightly stale
- *  during a session is a fine trade against re-fetching them per
- *  keystroke. */
-export async function fetchCategoryFacets(): Promise<CategoryFacet[]> {
+ *  product_screener_category_groups' own migration comment. Fetched
+ *  once on mount, not on every query: the facet counts drifting
+ *  slightly stale during a session is a fine trade against re-fetching
+ *  them per keystroke. */
+export async function fetchCategoryGroupFacets(): Promise<CategoryGroupFacet[]> {
   const { data, error } = await supabase
-    .from("product_screener_categories")
+    .from("product_screener_category_groups")
     .select("*")
-    .order("store", { ascending: true })
     .order("product_count", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as CategoryFacet[];
+  return (data ?? []) as CategoryGroupFacet[];
 }

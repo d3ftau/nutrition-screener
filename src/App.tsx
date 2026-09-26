@@ -3,8 +3,8 @@ import "./App.css";
 import { FilterPanel } from "./components/FilterPanel";
 import { ResultsTable } from "./components/ResultsTable";
 import { EMPTY_THRESHOLDS } from "./lib/types";
-import type { AdditiveTier, CategoryFacet, ScreenerProduct, SortState, ThresholdFilters } from "./lib/types";
-import { fetchCategoryFacets, runScreenerQuery } from "./lib/query";
+import type { AdditiveTier, CategoryGroupFacet, ScreenerProduct, SortState, ThresholdFilters } from "./lib/types";
+import { fetchCategoryGroupFacets, runScreenerQuery } from "./lib/query";
 import { PAGE_SIZE } from "./lib/constants";
 
 function App() {
@@ -14,8 +14,8 @@ function App() {
   const [excludedAllergens, setExcludedAllergens] = useState<string[]>([]);
   const [requiredDietTags, setRequiredDietTags] = useState<string[]>([]);
   const [requiredClaimTags, setRequiredClaimTags] = useState<string[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [categoryFacets, setCategoryFacets] = useState<CategoryFacet[]>([]);
+  const [categoryGroups, setCategoryGroups] = useState<string[]>([]);
+  const [categoryGroupFacets, setCategoryGroupFacets] = useState<CategoryGroupFacet[]>([]);
   const [showExcluded, setShowExcluded] = useState(false);
   const [sort, setSort] = useState<SortState>({ column: "protein_g_per_dollar", ascending: false });
   const [page, setPage] = useState(0);
@@ -30,8 +30,8 @@ function App() {
   // than the RESULTS do, and re-fetching it per keystroke would be pure
   // waste for something that's the same 27 rows either way.
   useEffect(() => {
-    fetchCategoryFacets()
-      .then(setCategoryFacets)
+    fetchCategoryGroupFacets()
+      .then(setCategoryGroupFacets)
       .catch((e) => console.error("Failed to load category facets:", e));
   }, []);
 
@@ -39,7 +39,7 @@ function App() {
   // a new result set would show a confusing "no rows" or wrong slice.
   useEffect(() => {
     setPage(0);
-  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categories, showExcluded, sort]);
+  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, showExcluded, sort]);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +48,7 @@ function App() {
       setError(null);
       runScreenerQuery({
         search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags,
-        categories, sort, page, showExcluded,
+        categoryGroups, sort, page, showExcluded,
       })
         .then((result) => {
           if (cancelled) return;
@@ -68,7 +68,7 @@ function App() {
       cancelled = true;
       clearTimeout(handle);
     };
-  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categories, showExcluded, sort, page]);
+  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, showExcluded, sort, page]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
@@ -92,7 +92,7 @@ function App() {
           excludedAllergens={excludedAllergens} onExcludedAllergensChange={setExcludedAllergens}
           requiredDietTags={requiredDietTags} onRequiredDietTagsChange={setRequiredDietTags}
           requiredClaimTags={requiredClaimTags} onRequiredClaimTagsChange={setRequiredClaimTags}
-          categoryFacets={categoryFacets} categories={categories} onCategoriesChange={setCategories}
+          categoryGroupFacets={categoryGroupFacets} categoryGroups={categoryGroups} onCategoryGroupsChange={setCategoryGroups}
           sort={sort} onSortChange={setSort}
           showExcluded={showExcluded} onShowExcludedChange={setShowExcluded}
         />

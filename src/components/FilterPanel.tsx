@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AdditiveTier, CategoryFacet, SortColumn, SortState, ThresholdFilters } from "../lib/types";
+import type { AdditiveTier, CategoryGroupFacet, SortColumn, SortState, ThresholdFilters } from "../lib/types";
 import { ADDITIVE_TIERS, ALLERGEN_TERMS, CLAIM_TAGS, DIET_TAGS, SORT_OPTIONS } from "../lib/constants";
 
 interface Props {
@@ -15,9 +15,9 @@ interface Props {
   requiredClaimTags: string[];
   onRequiredDietTagsChange: (tags: string[]) => void;
   onRequiredClaimTagsChange: (tags: string[]) => void;
-  categoryFacets: CategoryFacet[];
-  categories: string[];
-  onCategoriesChange: (categories: string[]) => void;
+  categoryGroupFacets: CategoryGroupFacet[];
+  categoryGroups: string[];
+  onCategoryGroupsChange: (categoryGroups: string[]) => void;
   sort: SortState;
   onSortChange: (s: SortState) => void;
   showExcluded: boolean;
@@ -26,21 +26,6 @@ interface Props {
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
-}
-
-/** Groups facets by store for display -- the two stores' category
- *  vocabularies are completely disjoint (measured: zero shared strings,
- *  same finding as diet/claim tags), so a flat merged list would jumble
- *  "Pantry" in next to "GROCERIES" with no indication of which store
- *  either belongs to. */
-function groupByStore(facets: CategoryFacet[]): Map<string, CategoryFacet[]> {
-  const grouped = new Map<string, CategoryFacet[]>();
-  for (const facet of facets) {
-    const forStore = grouped.get(facet.store) ?? [];
-    forStore.push(facet);
-    grouped.set(facet.store, forStore);
-  }
-  return grouped;
 }
 
 function NumberField({
@@ -58,25 +43,25 @@ function NumberField({
   );
 }
 
-/** categoryTop's real vocabulary is 146 Coles values and 74 Woolworths
- *  ones (2026-09-26, after fixing categoryTop to read the actual food
- *  category rather than each store's near-useless department bucket --
- *  see screenerFacts.ts). 220 checkboxes is too many to scan by eye, so
- *  this gets a search box that filters the chip list client-side --
- *  nothing here touches the database query, it only narrows which
- *  already-fetched facets are rendered. */
+/** ~49 canonical categories, cross-store (autopantry migration
+ *  20260926010000 hand-maps each store's own ~146/~74 raw categories
+ *  onto these -- "Ready To Eat Meals" and "FROZEN MEALS" are both
+ *  "Pre-Packaged Meals" here). One flat list, no store grouping needed
+ *  any more: a category_group is shared by construction. Still gets a
+ *  search box -- 49 is fewer than the 220 raw values this replaced, but
+ *  still more than a glance handles well. */
 function CategorySection({
-  categoryFacets, categories, onCategoriesChange,
+  categoryGroupFacets, categoryGroups, onCategoryGroupsChange,
 }: {
-  categoryFacets: CategoryFacet[];
-  categories: string[];
-  onCategoriesChange: (categories: string[]) => void;
+  categoryGroupFacets: CategoryGroupFacet[];
+  categoryGroups: string[];
+  onCategoryGroupsChange: (categoryGroups: string[]) => void;
 }) {
   const [filter, setFilter] = useState("");
   const needle = filter.trim().toLowerCase();
   const visible = needle.length === 0
-    ? categoryFacets
-    : categoryFacets.filter((f) => f.category_top.toLowerCase().includes(needle));
+    ? categoryGroupFacets
+    : categoryGroupFacets.filter((f) => f.category_group.toLowerCase().includes(needle));
 
   return (
     <div className="filter-section">
@@ -88,23 +73,18 @@ function CategorySection({
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
       />
-      {[...groupByStore(visible)].map(([store, facets]) => (
-        <div key={store} className="category-store-group">
-          <h4>{store} ({facets.length})</h4>
-          <div className="chip-grid">
-            {facets.map((f) => (
-              <label key={f.category_top} className="checkbox-row">
-                <input
-                  type="checkbox"
-                  checked={categories.includes(f.category_top)}
-                  onChange={() => onCategoriesChange(toggle(categories, f.category_top))}
-                />
-                <span>{f.category_top} ({f.product_count.toLocaleString()})</span>
-              </label>
-            ))}
-          </div>
-        </div>
-      ))}
+      <div className="chip-grid">
+        {visible.map((f) => (
+          <label key={f.category_group} className="checkbox-row">
+            <input
+              type="checkbox"
+              checked={categoryGroups.includes(f.category_group)}
+              onChange={() => onCategoryGroupsChange(toggle(categoryGroups, f.category_group))}
+            />
+            <span>{f.category_group} ({f.product_count.toLocaleString()})</span>
+          </label>
+        ))}
+      </div>
       {needle.length > 0 && visible.length === 0 && (
         <p className="filter-note">No category matches "{filter}".</p>
       )}
@@ -212,9 +192,9 @@ export function FilterPanel(props: Props) {
       </div>
 
       <CategorySection
-        categoryFacets={props.categoryFacets}
-        categories={props.categories}
-        onCategoriesChange={props.onCategoriesChange}
+        categoryGroupFacets={props.categoryGroupFacets}
+        categoryGroups={props.categoryGroups}
+        onCategoryGroupsChange={props.onCategoryGroupsChange}
       />
 
       <div className="filter-section">

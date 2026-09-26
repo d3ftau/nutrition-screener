@@ -15,6 +15,10 @@ export interface ScreenerProduct {
   net_content_basis: string | null;
   category: string | null;
   category_top: string | null;
+  // Cross-store canonical group ("Frozen Fish & Seafood" covers both
+  // Coles' own value AND Woolworths' "FREEZER - FISH"). category_top
+  // stays per-store; this is what the category filter uses.
+  category_group: string | null;
 
   calories_per_100g: number | null;
   protein_per_100g: number | null;
@@ -46,12 +50,15 @@ export interface ScreenerProduct {
 
 export type AdditiveTier = "avoid" | "caution" | "contested";
 
-/** One row per (store, category_top) -- fetched live, never hardcoded,
- *  because category_top is scrape-derived data that grows as crawls
- *  complete, not a code-level enum like the other filter facets. */
-export interface CategoryFacet {
-  store: string;
-  category_top: string;
+/** One row per canonical category_group -- fetched live, never
+ *  hardcoded, same reasoning as before (scrape-derived, not a
+ *  code-level enum), but now genuinely cross-store: a given group
+ *  covers whichever stores actually have products in it, so there's no
+ *  per-store grouping needed in the UI any more (autopantry migration
+ *  20260926010000 -- category_top's own per-store vocabulary is hand-
+ *  mapped onto ~49 shared names there). */
+export interface CategoryGroupFacet {
+  category_group: string;
   product_count: number;
 }
 

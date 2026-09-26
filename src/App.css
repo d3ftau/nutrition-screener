@@ -55,6 +55,17 @@
   margin-bottom: 8px;
 }
 
+.category-search-box {
+  width: 100%;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+}
+
 .category-store-group {
   margin-bottom: 10px;
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { AdditiveTier, CategoryFacet, SortColumn, SortState, ThresholdFilters } from "../lib/types";
 import { ADDITIVE_TIERS, ALLERGEN_TERMS, CLAIM_TAGS, DIET_TAGS, SORT_OPTIONS } from "../lib/constants";
 
@@ -54,6 +55,60 @@ function NumberField({
         onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))}
       />
     </label>
+  );
+}
+
+/** categoryTop's real vocabulary is 146 Coles values and 74 Woolworths
+ *  ones (2026-09-26, after fixing categoryTop to read the actual food
+ *  category rather than each store's near-useless department bucket --
+ *  see screenerFacts.ts). 220 checkboxes is too many to scan by eye, so
+ *  this gets a search box that filters the chip list client-side --
+ *  nothing here touches the database query, it only narrows which
+ *  already-fetched facets are rendered. */
+function CategorySection({
+  categoryFacets, categories, onCategoriesChange,
+}: {
+  categoryFacets: CategoryFacet[];
+  categories: string[];
+  onCategoriesChange: (categories: string[]) => void;
+}) {
+  const [filter, setFilter] = useState("");
+  const needle = filter.trim().toLowerCase();
+  const visible = needle.length === 0
+    ? categoryFacets
+    : categoryFacets.filter((f) => f.category_top.toLowerCase().includes(needle));
+
+  return (
+    <div className="filter-section">
+      <h3>Category</h3>
+      <input
+        className="category-search-box"
+        type="text"
+        placeholder="Find a category (e.g. meals, coffee, biscuits)..."
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+      />
+      {[...groupByStore(visible)].map(([store, facets]) => (
+        <div key={store} className="category-store-group">
+          <h4>{store} ({facets.length})</h4>
+          <div className="chip-grid">
+            {facets.map((f) => (
+              <label key={f.category_top} className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={categories.includes(f.category_top)}
+                  onChange={() => onCategoriesChange(toggle(categories, f.category_top))}
+                />
+                <span>{f.category_top} ({f.product_count.toLocaleString()})</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      ))}
+      {needle.length > 0 && visible.length === 0 && (
+        <p className="filter-note">No category matches "{filter}".</p>
+      )}
+    </div>
   );
 }
 
@@ -156,26 +211,11 @@ export function FilterPanel(props: Props) {
         </div>
       </div>
 
-      <div className="filter-section">
-        <h3>Category</h3>
-        {[...groupByStore(props.categoryFacets)].map(([store, facets]) => (
-          <div key={store} className="category-store-group">
-            <h4>{store}</h4>
-            <div className="chip-grid">
-              {facets.map((f) => (
-                <label key={f.category_top} className="checkbox-row">
-                  <input
-                    type="checkbox"
-                    checked={props.categories.includes(f.category_top)}
-                    onChange={() => props.onCategoriesChange(toggle(props.categories, f.category_top))}
-                  />
-                  <span>{f.category_top} ({f.product_count.toLocaleString()})</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      <CategorySection
+        categoryFacets={props.categoryFacets}
+        categories={props.categories}
+        onCategoriesChange={props.onCategoriesChange}
+      />
 
       <div className="filter-section">
         <h3>Require label claims</h3>

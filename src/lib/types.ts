@@ -38,6 +38,9 @@ export interface ScreenerProduct {
   price_per_100g: number | null;
   price_per_100kcal: number | null;
   protein_g_per_dollar: number | null;
+  // Floored whole percent off was_price; null unless was_price > price
+  // (multi-buy specials have no was_price, so no single discount).
+  discount_pct: number | null;
 
   additive_slugs: string[] | null;
   additive_tiers: string[] | null;
@@ -47,6 +50,8 @@ export interface ScreenerProduct {
   allergen_tokens: string[] | null;
   allergen_may_tokens: string[] | null;
 }
+
+export type DiscountBand = "over50" | "half" | "40to49" | "30to39";
 
 export type AdditiveTier = "avoid" | "caution" | "contested";
 
@@ -88,6 +93,7 @@ export type SortColumn =
   | "name"
   | "store"
   | "price"
+  | "discount_pct"
   | "price_per_100g"
   | "protein_g_per_dollar"
   | "protein_per_100kcal"

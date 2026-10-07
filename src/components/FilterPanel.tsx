@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { AdditiveTier, CategoryGroupFacet, SortColumn, SortState, ThresholdFilters } from "../lib/types";
-import { ADDITIVE_TIERS, ALLERGEN_TERMS, CLAIM_TAGS, DIET_TAGS, SORT_OPTIONS } from "../lib/constants";
+import type { AdditiveTier, CategoryGroupFacet, DiscountBand, SortColumn, SortState, ThresholdFilters } from "../lib/types";
+import { ADDITIVE_TIERS, ALLERGEN_TERMS, CLAIM_TAGS, DIET_TAGS, DISCOUNT_BANDS, SORT_OPTIONS } from "../lib/constants";
 
 interface Props {
   search: string;
@@ -18,6 +18,8 @@ interface Props {
   categoryGroupFacets: CategoryGroupFacet[];
   categoryGroups: string[];
   onCategoryGroupsChange: (categoryGroups: string[]) => void;
+  discountBands: DiscountBand[];
+  onDiscountBandsChange: (bands: DiscountBand[]) => void;
   sort: SortState;
   onSortChange: (s: SortState) => void;
   showExcluded: boolean;
@@ -127,6 +129,24 @@ export function FilterPanel(props: Props) {
             {props.sort.ascending ? "↑ Asc" : "↓ Desc"}
           </button>
         </div>
+      </div>
+
+      <div className="filter-section">
+        <h3>Specials</h3>
+        <p className="filter-note">
+          Off the store's was-price. Multi-buy deals (e.g. 2 for $5) have no
+          single discount and never match.
+        </p>
+        {DISCOUNT_BANDS.map((b) => (
+          <label key={b.value} className="checkbox-row">
+            <input
+              type="checkbox"
+              checked={props.discountBands.includes(b.value)}
+              onChange={() => props.onDiscountBandsChange(toggle(props.discountBands, b.value))}
+            />
+            <span>{b.label}</span>
+          </label>
+        ))}
       </div>
 
       <div className="filter-section">

@@ -30,6 +30,7 @@ export function ResultsTable({ rows, excludedTiers, excludedAllergens, showExclu
             <th>Name</th>
             <th>Store</th>
             <th>Price</th>
+            <th>Off</th>
             <th>$/100g</th>
             <th>Protein/$</th>
             <th>Protein/100kcal</th>
@@ -51,6 +52,7 @@ export function ResultsTable({ rows, excludedTiers, excludedAllergens, showExclu
                 </td>
                 <td>{r.store}</td>
                 <td>{r.price !== null ? `$${r.price.toFixed(2)}` : "—"}</td>
+                <td>{r.discount_pct !== null ? `${r.discount_pct}%` : "—"}</td>
                 <td>{r.price_per_100g !== null ? `$${fmt(r.price_per_100g)}` : "—"}</td>
                 <td>{fmt(r.protein_g_per_dollar, 1)}</td>
                 <td>{fmt(r.protein_per_100kcal, 1)}</td>

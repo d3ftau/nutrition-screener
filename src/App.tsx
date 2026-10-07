@@ -3,7 +3,7 @@ import "./App.css";
 import { FilterPanel } from "./components/FilterPanel";
 import { ResultsTable } from "./components/ResultsTable";
 import { EMPTY_THRESHOLDS } from "./lib/types";
-import type { AdditiveTier, CategoryGroupFacet, ScreenerProduct, SortState, ThresholdFilters } from "./lib/types";
+import type { AdditiveTier, CategoryGroupFacet, DiscountBand, ScreenerProduct, SortState, ThresholdFilters } from "./lib/types";
 import { fetchCategoryGroupFacets, runScreenerQuery } from "./lib/query";
 import { PAGE_SIZE } from "./lib/constants";
 
@@ -15,6 +15,7 @@ function App() {
   const [requiredDietTags, setRequiredDietTags] = useState<string[]>([]);
   const [requiredClaimTags, setRequiredClaimTags] = useState<string[]>([]);
   const [categoryGroups, setCategoryGroups] = useState<string[]>([]);
+  const [discountBands, setDiscountBands] = useState<DiscountBand[]>([]);
   const [categoryGroupFacets, setCategoryGroupFacets] = useState<CategoryGroupFacet[]>([]);
   const [showExcluded, setShowExcluded] = useState(false);
   const [sort, setSort] = useState<SortState>({ column: "protein_g_per_dollar", ascending: false });
@@ -39,7 +40,7 @@ function App() {
   // a new result set would show a confusing "no rows" or wrong slice.
   useEffect(() => {
     setPage(0);
-  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, showExcluded, sort]);
+  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, discountBands, showExcluded, sort]);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +49,7 @@ function App() {
       setError(null);
       runScreenerQuery({
         search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags,
-        categoryGroups, sort, page, showExcluded,
+        categoryGroups, discountBands, sort, page, showExcluded,
       })
         .then((result) => {
           if (cancelled) return;
@@ -68,7 +69,7 @@ function App() {
       cancelled = true;
       clearTimeout(handle);
     };
-  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, showExcluded, sort, page]);
+  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, discountBands, showExcluded, sort, page]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
@@ -93,6 +94,7 @@ function App() {
           requiredDietTags={requiredDietTags} onRequiredDietTagsChange={setRequiredDietTags}
           requiredClaimTags={requiredClaimTags} onRequiredClaimTagsChange={setRequiredClaimTags}
           categoryGroupFacets={categoryGroupFacets} categoryGroups={categoryGroups} onCategoryGroupsChange={setCategoryGroups}
+          discountBands={discountBands} onDiscountBandsChange={setDiscountBands}
           sort={sort} onSortChange={setSort}
           showExcluded={showExcluded} onShowExcludedChange={setShowExcluded}
         />

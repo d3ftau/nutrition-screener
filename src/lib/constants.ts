@@ -1,4 +1,4 @@
-import type { AdditiveTier, SortColumn } from "./types";
+import type { AdditiveTier, DiscountBand, SortColumn } from "./types";
 
 // Fixed set actually used by autopantry's screenerFacts.ts / additives
 // seed -- not guessed, mirrors supabase/functions/_shared/recipe-filter.ts
@@ -34,10 +34,22 @@ export const CLAIM_TAGS = [
   "omega-3", "high-in-antioxidants",
 ] as const;
 
+// Bounds on discount_pct, which the view FLOORS to a whole percent:
+// half-price specials whose halved price was rounded down to the cent
+// (was $7.75, now $3.87 = 50.06%) all land on exactly 50, so "more than
+// 50%" starts at 51 and means genuinely better than half price.
+export const DISCOUNT_BANDS: { value: DiscountBand; label: string; min: number; max: number | null }[] = [
+  { value: "over50", label: "More than 50% off", min: 51, max: null },
+  { value: "half", label: "50% off (half price)", min: 50, max: 50 },
+  { value: "40to49", label: "40–49% off", min: 40, max: 49 },
+  { value: "30to39", label: "30–39% off", min: 30, max: 39 },
+];
+
 export const SORT_OPTIONS: { value: SortColumn; label: string }[] = [
   { value: "name", label: "Name" },
   { value: "store", label: "Store" },
   { value: "price", label: "Price" },
+  { value: "discount_pct", label: "Discount %" },
   { value: "price_per_100g", label: "Price / 100g" },
   { value: "protein_g_per_dollar", label: "Protein / $" },
   { value: "protein_per_100kcal", label: "Protein / 100kcal" },

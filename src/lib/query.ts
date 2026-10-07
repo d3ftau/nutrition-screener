@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient";
-import type { AdditiveTier, CategoryGroupFacet, ScreenerProduct, SortState, ThresholdFilters } from "./types";
-import { PAGE_SIZE } from "./constants";
+import type { AdditiveTier, CategoryGroupFacet, DiscountBand, ScreenerProduct, SortState, ThresholdFilters } from "./types";
+import { DISCOUNT_BANDS, PAGE_SIZE } from "./constants";
 
 export interface QueryState {
   search: string;
@@ -10,6 +10,7 @@ export interface QueryState {
   requiredDietTags: string[];
   requiredClaimTags: string[];
   categoryGroups: string[];
+  discountBands: DiscountBand[];
   sort: SortState;
   page: number; // 0-indexed
   /** When true, excluded tiers/allergens are NOT filtered out of the
@@ -68,6 +69,18 @@ export async function runScreenerQuery(state: QueryState): Promise<QueryResult> 
   // so requiring more than one would always return nothing.
   if (state.categoryGroups.length > 0) {
     q = q.in("category_group", state.categoryGroups);
+  }
+
+  // OR semantics, same reasoning as categories: a product has one
+  // discount, so several picked bands mean "any of these". Each band is
+  // one and(...) group so non-adjacent picks (">50%" + "30-39%") work.
+  if (state.discountBands.length > 0) {
+    const groups = DISCOUNT_BANDS
+      .filter((b) => state.discountBands.includes(b.value))
+      .map((b) => b.max === null
+        ? `discount_pct.gte.${b.min}`
+        : `and(discount_pct.gte.${b.min},discount_pct.lte.${b.max})`);
+    q = q.or(groups.join(","));
   }
 
   q = q.order(state.sort.column, { ascending: state.sort.ascending, nullsFirst: false });

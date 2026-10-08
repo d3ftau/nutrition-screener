@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient";
 import type { AdditiveTier, CategoryGroupFacet, DiscountBand, ScreenerProduct, SortState, ThresholdFilters } from "./types";
-import { DISCOUNT_BANDS, PAGE_SIZE } from "./constants";
+import { DISCOUNT_BANDS, NON_FOOD_KINDS, PAGE_SIZE } from "./constants";
 
 export interface QueryState {
   search: string;
@@ -11,6 +11,7 @@ export interface QueryState {
   requiredClaimTags: string[];
   categoryGroups: string[];
   discountBands: DiscountBand[];
+  includeNonFood: boolean;
   sort: SortState;
   page: number; // 0-indexed
   /** When true, excluded tiers/allergens are NOT filtered out of the
@@ -25,6 +26,10 @@ export interface QueryResult {
 
 export async function runScreenerQuery(state: QueryState): Promise<QueryResult> {
   let q = supabase.from("product_screener").select("*", { count: "exact" });
+
+  if (!state.includeNonFood) {
+    q = q.not("product_kind", "in", `(${NON_FOOD_KINDS.join(",")})`);
+  }
 
   if (state.search.trim().length > 0) {
     q = q.ilike("name", `%${state.search.trim()}%`);

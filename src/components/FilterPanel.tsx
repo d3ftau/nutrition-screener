@@ -20,6 +20,8 @@ interface Props {
   onCategoryGroupsChange: (categoryGroups: string[]) => void;
   discountBands: DiscountBand[];
   onDiscountBandsChange: (bands: DiscountBand[]) => void;
+  includeNonFood: boolean;
+  onIncludeNonFoodChange: (v: boolean) => void;
   sort: SortState;
   onSortChange: (s: SortState) => void;
   showExcluded: boolean;
@@ -108,6 +110,14 @@ export function FilterPanel(props: Props) {
           value={props.search}
           onChange={(e) => props.onSearchChange(e.target.value)}
         />
+        <label className="checkbox-row">
+          <input
+            type="checkbox"
+            checked={props.includeNonFood}
+            onChange={(e) => props.onIncludeNonFoodChange(e.target.checked)}
+          />
+          <span>Include non-food, alcohol and pet food</span>
+        </label>
       </div>
 
       <div className="filter-section">

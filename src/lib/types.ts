@@ -41,6 +41,9 @@ export interface ScreenerProduct {
   // Floored whole percent off was_price; null unless was_price > price
   // (multi-buy specials have no was_price, so no single discount).
   discount_pct: number | null;
+  // retailer_product_class.kind, or "unclassified" if the classifier
+  // hasn't reached this product yet (never null -- see the view).
+  product_kind: "food" | "alcohol" | "pet_food" | "non_food" | "unclassified";
 
   additive_slugs: string[] | null;
   additive_tiers: string[] | null;

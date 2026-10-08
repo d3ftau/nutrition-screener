@@ -16,6 +16,7 @@ function App() {
   const [requiredClaimTags, setRequiredClaimTags] = useState<string[]>([]);
   const [categoryGroups, setCategoryGroups] = useState<string[]>([]);
   const [discountBands, setDiscountBands] = useState<DiscountBand[]>([]);
+  const [includeNonFood, setIncludeNonFood] = useState(false);
   const [categoryGroupFacets, setCategoryGroupFacets] = useState<CategoryGroupFacet[]>([]);
   const [showExcluded, setShowExcluded] = useState(false);
   const [sort, setSort] = useState<SortState>({ column: "protein_g_per_dollar", ascending: false });
@@ -29,7 +30,7 @@ function App() {
   // Fetched once, not part of the debounced query effect below -- the
   // facet LIST (which categories exist) changes on a much slower cadence
   // than the RESULTS do, and re-fetching it per keystroke would be pure
-  // waste for something that's the same 27 rows either way.
+  // waste for something that's the same ~49 rows either way.
   useEffect(() => {
     fetchCategoryGroupFacets()
       .then(setCategoryGroupFacets)
@@ -40,7 +41,7 @@ function App() {
   // a new result set would show a confusing "no rows" or wrong slice.
   useEffect(() => {
     setPage(0);
-  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, discountBands, showExcluded, sort]);
+  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, discountBands, includeNonFood, showExcluded, sort]);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,7 +50,7 @@ function App() {
       setError(null);
       runScreenerQuery({
         search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags,
-        categoryGroups, discountBands, sort, page, showExcluded,
+        categoryGroups, discountBands, includeNonFood, sort, page, showExcluded,
       })
         .then((result) => {
           if (cancelled) return;
@@ -69,7 +70,7 @@ function App() {
       cancelled = true;
       clearTimeout(handle);
     };
-  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, discountBands, showExcluded, sort, page]);
+  }, [search, thresholds, excludedTiers, excludedAllergens, requiredDietTags, requiredClaimTags, categoryGroups, discountBands, includeNonFood, showExcluded, sort, page]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
@@ -95,6 +96,7 @@ function App() {
           requiredClaimTags={requiredClaimTags} onRequiredClaimTagsChange={setRequiredClaimTags}
           categoryGroupFacets={categoryGroupFacets} categoryGroups={categoryGroups} onCategoryGroupsChange={setCategoryGroups}
           discountBands={discountBands} onDiscountBandsChange={setDiscountBands}
+          includeNonFood={includeNonFood} onIncludeNonFoodChange={setIncludeNonFood}
           sort={sort} onSortChange={setSort}
           showExcluded={showExcluded} onShowExcludedChange={setShowExcluded}
         />

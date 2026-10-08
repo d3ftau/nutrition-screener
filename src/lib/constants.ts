@@ -45,6 +45,11 @@ export const DISCOUNT_BANDS: { value: DiscountBand; label: string; min: number; 
   { value: "30to39", label: "30–39% off", min: 30, max: 39 },
 ];
 
+// Hidden unless "include non-food" is on. Unclassified products stay
+// visible: hiding real food because the classifier hasn't run yet would
+// be the worse mistake.
+export const NON_FOOD_KINDS = ["non_food", "alcohol", "pet_food"] as const;
+
 export const SORT_OPTIONS: { value: SortColumn; label: string }[] = [
   { value: "name", label: "Name" },
   { value: "store", label: "Store" },

@@ -7,7 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 // see autopantry's supabase/migrations/20260921030000_screener_public_read.sql).
 // This is a different threat model from an AI provider key, which must
 // never reach a client.
-const SUPABASE_URL = "https://gnuvmezhcckhxyepqsrc.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_drFEt9CoGDxMa7Fy0l0Log_32v5jQln";
+const SUPABASE_URL = "https://mdelaqxspebiiwcozhir.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_pIT2BtVd6Trq8YE3UJz54A_olblQTEz";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

@@ -257,6 +257,10 @@ export function FilterPanel(props: Props) {
             />
             <span>Show excluded rows anyway (flagged)</span>
           </label>
+          <p className="filter-note">
+            ALDI publishes no additive or allergen data, so its products are
+            hidden while anything is excluded. Shown anyway, they're flagged.
+          </p>
         </div>
       )}
     </div>

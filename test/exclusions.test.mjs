@@ -43,7 +43,7 @@ function flaggedNames(rows, showExcluded) {
 
 test("with showExcluded on, exactly the rows the server would have dropped are flagged", () => {
   const rows = [row(1, ["avoid"], []), row(2, [], ["peanut", "soy"]), row(3, ["caution"], ["soy"]),
-    row(4, null, null)];  // no data (ALDI): the client treats it as containing nothing
-  assert.deepEqual(flaggedNames(rows, true), ["p1", "p2"]);
+    row(4, null, null)];  // no data (ALDI): unknown, so flagged, as the server drops it
+  assert.deepEqual(flaggedNames(rows, true), ["p1", "p2", "p4"]);
   assert.deepEqual(flaggedNames(rows, false), []);
 });

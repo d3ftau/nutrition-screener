@@ -12,6 +12,9 @@ function fmt(n: number | null, digits = 2): string {
 }
 
 function isFlagged(row: ScreenerProduct, excludedTiers: AdditiveTier[], excludedAllergens: string[]): boolean {
+  // No data (ALDI) can't be shown clean: the server's not.cs drops these rows too.
+  if (excludedTiers.length > 0 && row.additive_tiers === null) return true;
+  if (excludedAllergens.length > 0 && row.allergen_tokens === null) return true;
   const tiers = row.additive_tiers ?? [];
   const allergens = row.allergen_tokens ?? [];
   return excludedTiers.some((t) => tiers.includes(t)) || excludedAllergens.some((a) => allergens.includes(a));

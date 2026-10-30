@@ -22,10 +22,33 @@ export interface QueryState {
 export interface QueryResult {
   rows: ScreenerProduct[];
   totalCount: number;
+  /** The exact count timed out and this is the planner's estimate. */
+  countIsEstimate: boolean;
 }
 
+// The rows (a 50-row page, milliseconds) and the exact count (every matching product,
+// seconds on the free-plan database) are separate requests: a count over the anon role's
+// 3 s statement timeout used to fail the whole search (2026-10-30). Now it falls back to
+// Postgres's estimate, which can be ~30% off, and the results show either way.
 export async function runScreenerQuery(state: QueryState): Promise<QueryResult> {
-  let q = supabase.from("product_screener").select("*", { count: "exact" });
+  const rowsQuery = filtered(supabase.from("product_screener").select("*"), state)
+    .order(state.sort.column, { ascending: state.sort.ascending, nullsFirst: false })
+    .range(state.page * PAGE_SIZE, state.page * PAGE_SIZE + PAGE_SIZE - 1);
+  const count = (kind: "exact" | "estimated") =>
+    filtered(supabase.from("product_screener").select("*", { count: kind, head: true }), state);
+
+  const [rows, exact] = await Promise.all([rowsQuery, count("exact")]);
+  if (rows.error) throw new Error(rows.error.message);
+  if (!exact.error) return { rows: (rows.data ?? []) as ScreenerProduct[], totalCount: exact.count ?? 0, countIsEstimate: false };
+  const estimate = await count("estimated");
+  if (estimate.error) throw new Error(estimate.error.message);
+  return { rows: (rows.data ?? []) as ScreenerProduct[], totalCount: estimate.count ?? 0, countIsEstimate: true };
+}
+
+// The same filters for the rows request and the count request.
+function filtered<Q>(query: Q, state: QueryState): Q {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- supabase-js's builder generics don't survive a helper
+  let q = query as any;
 
   if (!state.includeNonFood) {
     q = q.not("product_kind", "in", `(${NON_FOOD_KINDS.join(",")})`);
@@ -87,16 +110,7 @@ export async function runScreenerQuery(state: QueryState): Promise<QueryResult> 
         : `and(discount_pct.gte.${b.min},discount_pct.lte.${b.max})`);
     q = q.or(groups.join(","));
   }
-
-  q = q.order(state.sort.column, { ascending: state.sort.ascending, nullsFirst: false });
-
-  const from = state.page * PAGE_SIZE;
-  const to = from + PAGE_SIZE - 1;
-  q = q.range(from, to);
-
-  const { data, count, error } = await q;
-  if (error) throw error;
-  return { rows: (data ?? []) as ScreenerProduct[], totalCount: count ?? 0 };
+  return q;
 }
 
 /** category_group is scrape-derived, not a fixed enum, so the filter's

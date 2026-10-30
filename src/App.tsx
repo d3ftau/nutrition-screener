@@ -24,6 +24,7 @@ function App() {
 
   const [rows, setRows] = useState<ScreenerProduct[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [countIsEstimate, setCountIsEstimate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,6 +57,7 @@ function App() {
           if (cancelled) return;
           setRows(result.rows);
           setTotalCount(result.totalCount);
+          setCountIsEstimate(result.countIsEstimate);
         })
         .catch((e) => {
           if (cancelled) return;
@@ -79,7 +81,7 @@ function App() {
       <header className="app-header">
         <h1>Nutrition Screener</h1>
         <p className="subtitle">
-          {totalCount.toLocaleString()} matching products. Additive, allergen and
+          {countIsEstimate ? "About " : ""}{totalCount.toLocaleString()} matching products. Additive, allergen and
           label-claim data covers Woolworths and Coles; ALDI shows price and
           nutrition only. Dietary suitability tags are Woolworths-only — Coles
           does not publish them.

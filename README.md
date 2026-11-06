@@ -34,6 +34,8 @@ the price ratios) are computed in the view, in autopantry's
 ```
 npm install
 npm run dev
+npm test        # node --test on the query builder
+npm run lint
 ```
 
 ## Deploy
